@@ -1,27 +1,36 @@
+
+<style scoped lang="scss">
+
+</style>
+
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <n-space vertical>
+    <template v-for="(mc, i) in m.machine.configTable" :key="i">
+      <MConfig :mc="mc" :d="m"></MConfig>
+    </template>
+    <n-button text @click="addMConfig">
+      <n-icon>
+        <add></add>
+      </n-icon>
+    </n-button>
+  </n-space>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+<script setup lang="ts">
 
-export default defineComponent({
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-});
+import { ref, onMounted, watch, toRefs, computed } from 'vue'
+
+import { Add } from '@vicons/ionicons5'
+
+import { MachineModel, MConfigDecl } from '@/a_machine.ts'
+import MConfig from '@/components/MConfig'
+
+const m = new MachineModel()
+
+function addMConfig() {
+  m.machine.configTable.push(new MConfigDecl().reactive())
+}
+
+
 </script>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
