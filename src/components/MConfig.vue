@@ -20,7 +20,7 @@
       <tbody>
         <tr v-for="{t, fs} in transitions" :key="t">
           <td>
-            <n-dynamic-tags v-model:model="t.syms" placeholder="Tape symbol"></n-dynamic-tags>
+            <n-dynamic-tags v-model:value="t.syms" placeholder="Tape symbol"></n-dynamic-tags>
           </td>
           <td>
             <n-select v-model:value="fs.value" filterable tag :options="d._mconfig_options.value"></n-select>
@@ -50,7 +50,6 @@ import { ref, reactive, onMounted, watch, toRefs, computed } from 'vue'
 import { Add } from '@vicons/ionicons5'
 
 import { Sym, MConfigDecl, MachineModel, TransitionDecl } from '@/a_machine';
-import OpList from '@/components/OpList'
 
 export function mconfig2option(mc:MConfigDecl) {
   return {
@@ -63,6 +62,8 @@ export function mconfig2option(mc:MConfigDecl) {
 
 <script setup lang="ts">
 /* global defineProps, defineEmits */
+  
+import OpList from '@/components/OpList'
 
 
 const emit = defineEmits<{
