@@ -105,8 +105,8 @@ export class MachineExecution{
     this.stopWatch?.()
     this.stopWatch = null
   }
-  recompile(){
-    if(this.shouldRecompile) {
+  recompile(force=false){
+    if(this.shouldRecompile || force) {
       this.machine = this.model.machine.compile()
       if(Object.keys(this.machine).length == 0) {
         throw "Can't use a machine with no state..."
@@ -147,10 +147,15 @@ export class MachineExecution{
     if(++h.currentOp >= current.operations.length) {
       const nmc = (this.machine as CompiledMachine)[current.mconfig][current.symbol][0]
       const nsym = this.tape[this.cursorPos.value]
+      const t = (this.machine as CompiledMachine)[nmc][nsym]
+      if(t === undefined) {
+        throw "No transition for symbol `"+nsym+"` in state `"+nmc+"`"
+      }
+      
       h.states[++h.current] = {
         mconfig : nmc,
         symbol : nsym,
-        operations : (this.machine as CompiledMachine)[nmc][nsym][1],
+        operations : t[1],
         reverse: []
       }
       h.currentOp = 0

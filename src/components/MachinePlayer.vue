@@ -14,6 +14,21 @@
             </n-icon>
           </template>
         </n-button>
+        <n-button @click="togglePlayBack">
+          <template #icon>
+            <n-icon>
+              <Pause v-if="playingBack"/>
+              <PlayBack v-else/>
+            </n-icon>
+          </template>
+        </n-button>
+        <n-button round @click="reset">
+          <template #icon>
+            <n-icon>
+              <Refresh/>
+            </n-icon>
+          </template>
+        </n-button>
         <n-button @click="togglePlay">
           <template #icon>
             <n-icon>
@@ -50,7 +65,7 @@
 
 import { ref, onMounted, watch, toRefs, computed, nextTick } from 'vue'
 
-import { Play, Pause, PlaySkipForward, PlaySkipBack } from '@vicons/ionicons5'
+import { Play, PlayBack, Pause, Refresh, PlaySkipForward, PlaySkipBack } from '@vicons/ionicons5'
 import { useMessage } from 'naive-ui'
 
 import { MachineExecution } from '@/a_machine'
@@ -64,9 +79,13 @@ const state = computed( () => props.me.currentState() )
 const message = useMessage()
 
 const playing = ref(false)
+let playIntervalId:any = null
+
+
+const playingBack = ref(false)
+let playBackIntervalId:any = null
 
 const delay = ref(1.)
-let playIntervalId:any = null
 
 function showErrors(cb:()=>void){
   try{
@@ -90,6 +109,10 @@ function stepBackward() {
 }
 
 function togglePlay() {
+  if(playingBack.value) {
+    clearInterval(playBackIntervalId)
+    playingBack.value = false
+  }
   if(playing.value) {
     clearInterval(playIntervalId)
     playing.value = false
@@ -102,6 +125,29 @@ function togglePlay() {
     }, delay.value * 1000)
     playing.value = true
   }
+}
+
+function togglePlayBack() {
+  if(playing.value) {
+    clearInterval(playIntervalId)
+    playing.value = false
+  }
+  if(playingBack.value) {
+    clearInterval(playIntervalId)
+    playingBack.value = false
+  }
+  else {
+    playBackIntervalId = setInterval(() => {
+      nextTick( () => {
+        stepBackward()
+      })
+    }, delay.value * 1000)
+    playingBack.value = true
+  }
+}
+
+function reset(){
+  props.me.recompile(true)
 }
 
 watch( delay, (nv) => {
